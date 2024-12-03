@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import GUI from 'lil-gui'
-import { materialAOMap } from 'three/webgpu'
+
 
 /**
  * Debug
@@ -13,6 +13,9 @@ const parameters = {
 
 gui
     .addColor(parameters, 'materialColor')
+    .onChange(() => {
+        material.color.set(parameters.materialColor)
+    })
 
 /**
  * Base
@@ -24,23 +27,51 @@ const canvas = document.querySelector('canvas.webgl')
 const scene = new THREE.Scene()
 
 /**
+ * Textures
+ */
+
+const textureLoader = new THREE.TextureLoader();
+const gradientTexture = textureLoader.load('./textures/gradients/3.jpg')
+gradientTexture.minFilter = THREE.NearestFilter;
+gradientTexture.magFilter = THREE.NearestFilter;
+gradientTexture.generateMipmaps = false;
+
+/**
  * Objects
  */
 
-const meshes = [
-    {
-        geometry: new THREE.TorusGeometry(1, .4, 14, 40,),
-        material: new THREE.MeshBasicMaterial({map: '#ff0000'})
-    },
-    {
-        geometry: new THREE.ConeGeometry(1, 2, 32),
-        material: new THREE.MeshBasicMaterial({map: '#ff0000'})
-    },
-    {
-        geometry: new THREE.TorusKnotGeometry(.8, .32, 100, 60),
-        material: new THREE.MeshBasicMaterial({map: '#ff0000'})
-    }
-]
+const material = new THREE.MeshToonMaterial({ 
+    color: parameters.materialColor,
+    gradientMap: gradientTexture
+})
+
+const mesh1 = new THREE.Mesh(
+    new THREE.TorusGeometry(1, .4, 14, 40,),
+    material
+);
+
+const mesh2 = new THREE.Mesh(
+    new THREE.ConeGeometry(1, 2, 32),
+    material
+);
+
+const mesh3 = new THREE.Mesh(
+    new THREE.TorusKnotGeometry(.8, .32, 100, 60),
+    material
+);
+
+
+scene.add(mesh1, mesh2, mesh3)
+
+/**
+ * Lights
+ */
+
+const directionalLight = new THREE.DirectionalLight('#ffffff', 3);
+
+directionalLight.position.set(1, 1, 1)
+
+scene.add(directionalLight)
 
 /**
  * Sizes
