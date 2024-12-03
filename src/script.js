@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import GUI from 'lil-gui'
+import { clipping } from 'three/src/nodes/accessors/ClippingNode.js'
 
 
 /**
@@ -60,6 +61,16 @@ const mesh3 = new THREE.Mesh(
     material
 );
 
+const objectsDistance = 4;
+
+mesh1.position.y = 0
+mesh2.position.y = - objectsDistance * 1
+mesh3.position.y = - objectsDistance * 2
+
+mesh1.position.x = 2
+mesh2.position.x = - 2
+mesh3.position.x = 2
+
 
 scene.add(mesh1, mesh2, mesh3)
 
@@ -69,9 +80,11 @@ scene.add(mesh1, mesh2, mesh3)
 
 const directionalLight = new THREE.DirectionalLight('#ffffff', 3);
 
-directionalLight.position.set(1, 1, 1)
+directionalLight.position.set(1, 1, 0)
 
 scene.add(directionalLight)
+
+const sectionMeshes = [mesh1, mesh2, mesh3]
 
 /**
  * Sizes
@@ -114,6 +127,12 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
+let scrollY = window.scrollY;
+
+window.addEventListener('scroll', () => {
+    scrollY = window.scrollY
+})
+
 /**
  * Animate
  */
@@ -122,6 +141,15 @@ const clock = new THREE.Clock()
 const tick = () =>
 {
     const elapsedTime = clock.getElapsedTime()
+
+    // Animate camera
+    camera.position.y = - scrollY / sizes.height * objectsDistance * 1.1
+
+    // Animate meshes
+    for(const mesh of sectionMeshes) {
+        mesh.rotation.x = elapsedTime * .2
+        mesh.rotation.y = elapsedTime * .22
+    }
 
     // Render
     renderer.render(scene, camera)
