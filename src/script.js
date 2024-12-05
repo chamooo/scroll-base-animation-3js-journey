@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import GUI from 'lil-gui'
-import { clipping } from 'three/src/nodes/accessors/ClippingNode.js'
+
 
 
 /**
@@ -112,10 +112,14 @@ window.addEventListener('resize', () =>
 /**
  * Camera
  */
+
+const cameraGroup = new THREE.Group();
+scene.add(cameraGroup)
+
 // Base camera
 const camera = new THREE.PerspectiveCamera(35, sizes.width / sizes.height, 0.1, 100)
 camera.position.z = 6
-scene.add(camera)
+cameraGroup.add(camera)
 
 /**
  * Renderer
@@ -127,11 +131,34 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
+/**
+ * Scroll
+ */
+
 let scrollY = window.scrollY;
 
 window.addEventListener('scroll', () => {
     scrollY = window.scrollY
 })
+
+
+/**
+ * Cursor
+ */
+
+const cursor = {
+    x: 0,
+    y: 0
+}
+
+window.addEventListener('mousemove', (e) => {
+    cursor.x = e.clientX / sizes.width - .5;
+    cursor.y = e.clientY / sizes.height - .5;
+    console.log(cursor);
+    
+
+})
+
 
 /**
  * Animate
@@ -144,6 +171,12 @@ const tick = () =>
 
     // Animate camera
     camera.position.y = - scrollY / sizes.height * objectsDistance * 1.1
+
+    const parallaxX = cursor.x;
+    const parallaxY = -cursor.y;
+
+    cameraGroup.position.x = parallaxX
+    cameraGroup.position.y = parallaxY
 
     // Animate meshes
     for(const mesh of sectionMeshes) {
