@@ -74,6 +74,36 @@ mesh3.position.x = 2
 
 scene.add(mesh1, mesh2, mesh3)
 
+const sectionMeshes = [mesh1, mesh2, mesh3]
+
+/**
+ * Particles
+ */
+
+const particlesGeometry = new THREE.BufferGeometry();
+const count = 200;
+
+const positions = new Float32Array(count * 3) // Multiply by 3 because each position is composed of 3 values (x, y, z)
+
+for(let i = 0; i < count * 3; i++) {
+    positions[i * 3 + 0] = (Math.random() - 0.5) * 10;
+	positions[i * 3 + 1] = objectsDistance * 0.5 - Math.random() * objectsDistance * sectionMeshes.length
+	positions[i * 3 + 2] = (Math.random() - 0.5) * 10;
+}
+
+particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+
+const particlesMaterial = new THREE.PointsMaterial({
+    color: parameters.materialColor,
+    sizeAttenuation: true, // enable perspective
+    size: .03
+})
+
+const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+
+scene.add(particles)
+
+
 /**
  * Lights
  */
@@ -84,7 +114,6 @@ directionalLight.position.set(1, 1, 0)
 
 scene.add(directionalLight)
 
-const sectionMeshes = [mesh1, mesh2, mesh3]
 
 /**
  * Sizes
@@ -154,9 +183,6 @@ const cursor = {
 window.addEventListener('mousemove', (e) => {
     cursor.x = e.clientX / sizes.width - .5;
     cursor.y = e.clientY / sizes.height - .5;
-    console.log(cursor);
-    
-
 })
 
 
@@ -177,8 +203,8 @@ const tick = () =>
     // Animate camera
     camera.position.y = - scrollY / sizes.height * objectsDistance * 1.1
 
-    const parallaxX = cursor.x;
-    const parallaxY = -cursor.y;
+    const parallaxX = cursor.x * .5;
+    const parallaxY = -cursor.y * .5;
 
     cameraGroup.position.x += (parallaxX - cameraGroup.position.x) * 3 * deltaTime // (distance from current pos to the destination) * speed
     cameraGroup.position.y += (parallaxY - cameraGroup.position.y) * 3 * deltaTime
