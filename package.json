@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@webgpu/types": "^0.1.51",
+    "gsap": "^3.12.5",
     "lil-gui": "^0.19.2",
     "three": "^0.171.0"
   }

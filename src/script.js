@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import GUI from 'lil-gui'
-
+import gsap from 'gsap'
+import { clipping } from 'three/src/nodes/accessors/ClippingNode.js'
 
 
 /**
@@ -165,9 +166,21 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
  */
 
 let scrollY = window.scrollY;
-
+let currentSection = 0;
 window.addEventListener('scroll', () => {
     scrollY = window.scrollY
+
+    const newSection = Math.round(window.scrollY / sizes.height);
+    if(newSection !== currentSection) {
+        currentSection = newSection;
+        gsap.to(sectionMeshes[currentSection].rotation, {
+            x: '+=6',
+            y: '+=3',
+            z: '+=1.5',
+            ease: 'power2.inOut',
+            duration: 2
+        })
+    }
 })
 
 
@@ -211,8 +224,8 @@ const tick = () =>
 
     // Animate meshes
     for(const mesh of sectionMeshes) {
-        mesh.rotation.x = elapsedTime * .2
-        mesh.rotation.y = elapsedTime * .22
+        mesh.rotation.x += deltaTime * .2
+        mesh.rotation.y += deltaTime * .22
     }
 
     // Render
